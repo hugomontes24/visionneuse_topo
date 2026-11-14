@@ -43,9 +43,10 @@ L'application permet :
 ```text
 visionneuse_topo
 │
-├── README.md
-├── ARCHITECTURE.md
-├── AGENT_CONTEXT.md
+├── .github
+│	├── INSTRUCTIONS.md
+│	├── ARCHITECTURE.md
+│	├── CONTEXT.md
 │
 ├── api_viewer
 │   ├── config
