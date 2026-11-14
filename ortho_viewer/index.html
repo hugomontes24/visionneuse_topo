@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link rel="stylesheet" href="css/style.css"/>
+    <link rel="stylesheet" href="css/style_aside.css"/>
+    <link rel="stylesheet" href="css/utils.css"/>
+    <link rel="stylesheet" href="css/style_3D.css"/>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="icon" type="image/svg+xml" href="assets/pictures/favicon.svg"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Dosis:wght@200..800&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/digidem/leaflet-side-by-side@gh-pages/layout.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"/>
+    
+    <title>Visionneuse </title>
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+            }
+        }
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/proj4js/2.9.0/proj4.js"></script>
+</head>
+<body>
+<div class="main">
+
+<div id="div-header">
+    <div id="logo">
+        <img src="assets/pictures/logo.svg" alt="logo">
+    </div>
+    <div data-mode="normal" class="mode timeline"></div><!-- timeline mode normal -->
+
+    <!-- <div class="timeline mode_timelapse">  timeline mode_timelapse 
+        
+            <div class="div-timeline buttons" id="buttons">
+                <div class="timeline-item"><div class="timeline-year">2023</div>
+                <div class="timeline-dot">
+                    <button id="2" class="button"></button>
+                </div>
+            </div>
+
+    </div> -->
+
+    <div class="compte"></div>
+</div> <!-- end div-header -->   
+
+<div class="container3D hidden" id="container3d" >
+    <!-- Overlay de chargement -->
+    <div id="loader-3d" class="loader-overlay">
+        <div class="spinner"></div>
+        <div id="loader-text">Chargement du modèle 3D...</div>
+        <div class="progress-bar-container">
+            <div id="progress-bar" class="progress-bar"></div>
+        </div>
+    </div>
+</div><!-- end container3D -->  
+
+  <div id="app">
+
+     <div id="map_div">
+        <div id="map" data-mode1="normal"></div>
+
+        <div id="map-controls"> 
+            <div class="div_micro">
+                <button id="btn_edit" class="map-btn" title="Mode édition">
+                    <img src="assets/pictures/edit-white-100.png" alt="icone edition" />
+                </button>
+                <button id="btn_micro" class="map-btn" title="Microphone">🎤</button>
+            </div>          
+            <div class="b2d3d">
+                <button id="btn_2d" class="map-btn active" title="2D">2D</button>
+                <button id="btn_3d" class="map-btn" title="3D">3D</button>
+            </div>
+
+            <div class="div_nuage">
+                <button id="btn_nuage" class="map-btn" title="Nuage de points">
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L3 7L12 12L21 7L12 2Z" stroke-width="1.5" stroke-dasharray="2 2"/>
+                        <path d="M3 17L12 22L21 17" stroke-width="1.5" stroke-dasharray="2 2"/>
+                        <path d="M3 12L12 17L21 12" stroke-width="1.5" stroke-dasharray="2 2"/>
+                        <circle cx="12" cy="2" r="1.2" fill="currentColor"/>
+                        <circle cx="3" cy="7" r="1.2" fill="currentColor"/>
+                        <circle cx="21" cy="7" r="1.2" fill="currentColor"/>
+                        <circle cx="12" cy="12" r="1.2" fill="currentColor"/>
+                        <circle cx="12" cy="17" r="1.2" fill="currentColor"/>
+                        <circle cx="12" cy="22" r="1.2" fill="currentColor"/>
+                    </svg>
+                                        
+                </button>             
+            </div>
+
+            <!-- <div class="div_filter">
+                <button id="btn_filter" class="map-btn-filter">
+                    <img src="assets/pictures/white-filter-50.png" alt="icone filtre" />
+                </button>
+                <div id="display_filter">
+                    <label for="select_etat">État :</label>
+                    <select id="select_etat">
+                        <option value="-1" selected>Tous</option>
+                        <option value="0">Normal</option>
+                        <option value="1">À contrôler</option>
+                        <option value="2">À risque</option>
+                    </select>
+                </div>
+            </div> -->
+
+            <div class="div_utils">
+                <button id="btn_bef_aft" class="map-btn" title="Avant/Après">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="12" y1="3" x2="12" y2="21"></line>
+                        <polyline points="9 8 6 12 9 16"></polyline>
+                        <polyline points="15 8 18 12 15 16"></polyline>
+                    </svg>
+                </button>
+                <button id="btn_point_coords" class="map-btn" title="Coordonnées">
+                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round">
+                        <!-- Le cercle central -->
+                        <circle cx="12" cy="12" r="5" fill="none"/>
+                        <!-- La croix qui dépasse du cercle -->
+                        <line x1="12" y1="3" x2="12" y2="21"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                    </svg>
+                    
+                </button>
+            </div>
+
+            <div>
+                <button id="btn_fullscreen" class="map-btn fullscreen_btn" title="Plein écran">&#x26F6;</button>
+            </div>  
+        </div>
+     </div>
+
+    <div id="sidebar_div" class="mode_home">
+
+         <div id="sidebar">
+            <h2 id="sidebar_title"></h2>
+            <div id="sidebar_header" class="sidebar-header"></div>
+            <div id="sidebar_content">
+                <span id="aside-info-name" class="fs-8"></span><br>
+                <span id="aside-info-descr" class="fs-8"></span><br>
+                <div id="aside-coords" class="fs-7">
+                    <span id="aside-coords-cc44" class="fs-7"></span><br>
+                    <span id="aside-coords-w84" class="fs-7"></span><br>
+                </div>
+            </div>
+        </div>
+         <!-- Timeline pour les boutons dynamiques -->
+            <section id="timeline" class="section-timeline">
+                <div class="div-timeline buttons" id="buttonsAvAp"></div>
+            </section>
+
+
+            <!-- <div id="opacity-control" class="leaflet-bar"> -->
+                <!-- <label for="opacity-slider">Opacité 2025 : <span id="opacity-value">100%</span></label> -->
+                <!-- <input type="range" id="opacity-slider" min="0" max="1" step="0.05" value="1">
+            </div> -->
+      
+        <div id="notification_container"></div>
+        
+    </div><!-- end sidebar_div -->
+
+  </div><!-- end app -->
+</div><!-- end main -->
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/digidem/leaflet-side-by-side@gh-pages/leaflet-side-by-side.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
+<script src="./js/config/config.js"></script>
+<script src="js/Entities/Site.js"></script>
+<script src="js/Entities/Zone.js"></script>
+<script src="js/Entities/ZoneDTO.js"></script>
+<script src="js/Entities/Raster.js"></script>
+<script src="js/Entities/Tampon.js"></script>
+<script src="js/Entities/Pipe.js"></script>
+<script src="js/modules/views.module.js" type="module"></script>
+<script src="js/methods/initMap.js"></script><!-- Initialisation de la carte  -->
+<script src="js/methods/layersManager.js"></script>
+
+<script>
+  
+
+    // const tilesource2_layer = L.tileLayer('./tuiles/tuiles_102026/{z}/{x}/{y}.png', 
+    //                                         {   minZoom: 13, maxZoom: 22,
+    //                                             pane: 'paneRasters', 
+    //                                             tms: false, 
+    //                                             attribution: 'Created by QGIS'
+    //                                         }).addTo(map);
+        
+    // const tilesource1_layer = L.tileLayer(photos[0].url, 
+    //                                         {   minZoom: 13, maxZoom: 22, 
+    //                                             pane: 'paneRasters',
+    //                                             tms: false, 
+    //                                             attribution: 'Created by QGIS'
+    //                                         }).addTo(map);
+    
+    // const tilesource2_layer = L.tileLayer(photos[1].url, 
+    //                                         {   minZoom: 13, maxZoom: 22,
+    //                                             pane: 'paneRasters', 
+    //                                             tms: false, 
+    //                                             attribution: 'Created by QGIS'
+    //                                         }).addTo(map);
+
+    // const sitesLayerGroup = L.layerGroup(); // Groupe de calques pour les sites
+        
+    //     const zoneLayerGroup = new L.FeatureGroup().addTo(map);
+
+    //     const tamponEPLayerGroup = L.layerGroup();
+    //     const pipeEPLayerGroup = L.layerGroup();
+
+    //     const tamponEULayerGroup = L.layerGroup();
+    //     const pipeEULayerGroup = L.layerGroup();
+
+        // const eauPluvialeGroup = L.layerGroup([tamponEPLayerGroup, pipeEPLayerGroup]);
+        // const eauUseeGroup     = L.layerGroup([tamponEULayerGroup, pipeEULayerGroup]);
+
+           
+
+        // 2. Ajouter la barre d'outils de dessin
+        const drawControl = new L.Control.Draw({
+            edit: {
+                featureGroup: zoneLayerGroup
+            },
+            draw: {
+                polygon: true,   // On active les polygones
+                polyline: false, // On désactive ce dont on n'a pas besoin
+                rectangle: false,
+                circle: false,
+                marker: true
+            }
+        });
+        map.addControl(drawControl);
+        
+        // const overlayMaps = {
+        //     "Eaux Pluviales (EP)": eauPluvialeGroup,
+        //     "Eaux Usées (EU)": eauUseeGroup
+        // };
+        // overlayMaps[photos[0].date] = tilesource1_layer;// *****
+        // overlayMaps[photos[1].date] = tilesource2_layer;// *****
+
+          // 4. Boucle d'automatisation sur toutes les photos
+    // photos.forEach((photo, index) => {
+    //     // Création de la couche Leaflet pour chaque photo du tableau
+    //     const layer = L.tileLayer(photo.url, { 
+    //         minZoom: 13, 
+    //                     maxZoom: 22,
+    //                     pane: 'paneRasters', 
+    //                     tms: false, 
+    //                     attribution: 'Created by QGIS' 
+    //                 });
+
+    //     // Optionnel : tu peux décider d'en afficher une par défaut sur la carte (ex: la dernière)
+    //     if (index === photos.length - 1) {
+    //         layer.addTo(map);
+    //     }
+    //     // On la stocke dans le tableau global des couches
+    //     dynamicLayers.push(layer);
+
+    //     // On l'ajoute dynamiquement dans l'objet overlayMaps avec sa date comme titre
+    //     overlayMaps[photo.date] = layer;
+    // });
+
+
+    // L.control.layers( baseMaps, overlayMaps, {
+    //         collapsed : true,
+    //         position : 'bottomleft'
+    //     }).addTo(map);
+    var zoomControl = L.control.zoom({
+        position: 'bottomleft'
+    }).addTo(map);
+
+</script>
+<script src="js/methods/utils.js"></script>
+<script src="js/methods/beforeAfter.js"></script>
+<script src="js/methods/pointCoords.js"></script>
+<script src="js/services/serviceSites.js"></script>
+<script src="js/services/serviceZones.js"></script>
+<script src="js/services/serviceTampons.js"></script>
+<script src="js/services/servicePipes.js"></script>
+<script src="js/services/serviceRasters.js"></script>
+<script src="js/custom.js"></script>
+<script src="js/methodsZones.js"></script>
+<script src="js/viewer.js"></script>
+<script src="js/services/serviceHttp.js"></script>
+
+
+</body>
+</html>
+
+
+  <!-- pour le viewer 3D -->
+  <!-- <script type="module"> 
+   import { init3DViewer, startAnimation, stopAnimation, update3DLayout, get3DState } from './js/viewer3d.js'; 
+    const modelPath = './assets/models_3D/site_3d.glb';
+
+        window.view3D = function() {
+            btn2D.classList.remove("active");
+            btn3D.classList.add("active");
+
+            container3d.classList.add("visible");
+            container3d.classList.remove("hidden");
+
+            const state = get3DState();
+
+            // Premier clic : initialisation et chargement
+            if (!state.isInitialized) {
+                init3DViewer(modelPath);
+            } else {
+            // Clics suivants : maj taille canvas et reprise de la boucle
+                update3DLayout();
+                if (state.isLoaded) {
+                    startAnimation();
+                }
+            }
+        };
+
+        window.view2D = function() {
+            btn2D.classList.add("active");
+            btn3D.classList.remove("active");
+
+            container3d.classList.remove("visible");
+            container3d.classList.add("hidden");
+
+            // Stoppe le rendu GPU en fond
+            stopAnimation();
+        };
+
+  </script> -->
+
+    <!-- <div id="sidebar_div" class="mode_home"> -->
+        
+        <!-- 
+        <div>
+            <div class="pourcentage">
+                <div id="btn_etat_normal" class="div_etat">
+                        <span id="span_normal" class="etat_color normal"></span>               
+                    <div>
+                        <span id="span_normal_count"></span> % photos normales
+                    </div>
+                </div>
+                <div id="btn_etat_attention" class="div_etat">
+                    <span id="span_attention" class="etat_color attention"></span>
+                    <div>
+                        <span id="span_attention_count"></span> % à controler
+                    </div>
+                </div>
+                <div id="btn_etat_danger" class="div_etat">
+                    <span id="span_danger" class="etat_color danger"></span>
+                    <div>
+                        <span id="span_danger_count"></span> % à risque
+                    </div>
+                </div>
+
+            </div>
+            <div id="picture_container">
+                <img id="chosen_picture" src="" alt="">   image border will be set in js "warning", "danger", "normal"
+            </div>
+            <div class="picture_detail">
+                <div id="picture_name"></div>
+                <div id="picture_description">
+                    <p>Nom : <span id="photo_name"></span></p>
+                    <p>Longitude : <span id="lng"></span></p>
+                    <p>Latitude : <span id="lat"></span></p>
+                    <p>A faire : <br>
+                        <span id="p_description"></span>
+                    </p>
+                </div>
+
+            </div>
+            
+
+        </div>
+        <div id="notification_container"></div>
+        
+    </div>end sidebar_div -->
+
+     <!-- const appMode = {
+        NORMAL: 'mode_normal',
+        EDIT: 'mode_edit',
+        ADD: 'mode_add',
+        EDIT_ZONE: 'mode_edit_zone'
+    };
+
+       
+   
+    
+    
+    
+    
+    
+    
+    -->

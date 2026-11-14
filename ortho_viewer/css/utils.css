@@ -1,0 +1,188 @@
+@charset "UTF-8";
+#side-by-side-left-container {
+  position: absolute;
+  bottom: 25rem; /* Ajustez la distance par rapport au bas */
+  left: 0px; /* Ajustez la distance par rapport à la gauche */
+  z-index: 1000; /* Assure qu'il est bien au-dessus de la carte */
+  padding: 2rem 0.5rem 1Rem;
+  border-radius: 0 5px 5px 0;
+  background-color: rgba(14, 14, 14, 0.579);
+  /* Application de l'animation (durée 0.3s avec un effet fluide à la fin) */
+  animation: slideUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#side-by-side-left-container #opacity-slider-left {
+  display: block;
+  width: 100px;
+  height: 2px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+#side-by-side-left-container .back {
+  position: absolute;
+  right: 5px;
+  top: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background-color: rgba(255, 253, 253, 0.897);
+  transition: ease-in-out 0.2s;
+  cursor: pointer;
+}
+#side-by-side-left-container .back svg {
+  width: 100%;
+  height: 100%;
+}
+#side-by-side-left-container .back:hover {
+  background-color: rgba(233, 229, 203, 0.8745098039);
+  transform: scale(1.1);
+}
+
+#side-by-side-right-container {
+  position: absolute;
+  bottom: 25rem; /* Ajustez la distance par rapport au bas */
+  right: 0px; /* Ajustez la distance par rapport à la gauche */
+  z-index: 1000; /* Assure qu'il est bien au-dessus de la carte */
+  padding: 2rem 0.5rem 1rem;
+  border-radius: 5px 0 0 5px;
+  background-color: rgba(14, 14, 14, 0.579);
+  /* Application de l'animation (durée 0.3s avec un effet fluide à la fin) */
+  animation: slideUp 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+#side-by-side-right-container #opacity-slider-right {
+  display: block;
+  width: 100px;
+  height: 2px;
+  margin-top: 5px;
+  cursor: pointer;
+}
+#side-by-side-right-container .back {
+  position: absolute;
+  left: 5px;
+  top: 5px;
+  width: 20px;
+  height: 20px;
+  border-radius: 4px;
+  background-color: rgba(255, 253, 253, 0.897);
+  transition: ease-in-out 0.2s;
+  cursor: pointer;
+}
+#side-by-side-right-container .back svg {
+  width: 100%;
+  height: 100%;
+}
+#side-by-side-right-container .back:hover {
+  background-color: rgba(233, 229, 203, 0.8745098039);
+  transform: scale(1.1);
+}
+
+.custom-left-timeline .timeline-title {
+  color: #f7f7f5;
+  font-size: 0.9rem;
+  text-align: center;
+  font-family: Arial;
+  margin: 0 0 0.3rem;
+}
+.custom-left-timeline .timeline1-item .button1 {
+  margin: 4px 0 4px 0;
+  border-radius: 5px;
+  transition: 0.2s ease-in-out;
+  padding: 2px 5px 2px 5px;
+  cursor: pointer;
+}
+.custom-left-timeline .timeline1-item.active .button1 {
+  background-color: #d39c04;
+  color: white;
+}
+.custom-left-timeline .timeline1-item .button:active {
+  animation: clickPress 0.2s ease;
+}
+
+.custom-right-timeline .timeline-title {
+  color: #f7f7f5;
+  font-size: 0.9rem;
+  text-align: center;
+  font-family: Arial;
+  margin: 0 0 0.3rem;
+}
+.custom-right-timeline .timeline-item .button {
+  margin: 4px 0 4px 0;
+  border-radius: 5px;
+  transition: 0.2s ease-in-out;
+  padding: 2px 5px 2px 5px;
+  cursor: pointer;
+}
+.custom-right-timeline .timeline-item.active .button {
+  background-color: #e96868;
+  color: white;
+}
+.custom-right-timeline .timeline-item .button:active {
+  animation: clickPress 0.2s ease;
+}
+
+.timeline-item .button {
+  margin: 4px 0 4px 0;
+  border-radius: 5px;
+  transition: 0.2s ease-in-out;
+  padding: 2px 5px 2px 5px;
+}
+.timeline-item.active .button {
+  background-color: #d39c04;
+  color: white;
+}
+.timeline-item .button:active {
+  animation: clickPress 0.2s ease;
+}
+
+.map-btn:active {
+  animation: clickPress 0.2s ease;
+}
+
+.map-btn.active {
+  background: #2c7be5;
+  color: white;
+}
+
+/* Empêche les interférences de la carte sur le conteneur du side-by-side */
+.leaflet-sbs .leaflet-sbs-divider, .leaflet-sbs .leaflet-sbs-range {
+  pointer-events: auto !important;
+  cursor: ew-resize !important;
+}
+.leaflet-sbs .leaflet-sbs-range {
+  background: rgba(55, 155, 228, 0.6588235294) !important;
+}
+.leaflet-sbs .leaflet-sbs-divider {
+  width: 2px !important;
+  background: rgba(55, 155, 228, 0.6588235294) !important;
+}
+
+@keyframes clickPress {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(2px, 2px);
+  } /* S'enfonce de 2px en bas et à droite */
+  100% {
+    transform: translate(0, 0);
+  } /* Revient à sa place */
+}
+/* Définition de l'animation d'apparition */
+@keyframes slideUp {
+  0% {
+    transform: translateY(200px); /* Part 200px plus bas */
+    opacity: 0; /* Totalement transparent au début */
+  }
+  100% {
+    transform: translateY(0); /* Revient à sa position normale */
+    opacity: 1; /* Entièrement visible */
+  }
+}
+.none, .hidden {
+  display: none !important;
+}/*# sourceMappingURL=utils.css.map */
