@@ -1,5 +1,18 @@
 const targetZoom = 19; // Niveau de zoom souhaité lors du clic sur un marqueur
 const sideBarTitle = document.getElementById("sidebar_title");
+const asideSiteCoordsDiv = document.getElementById("aside-site-coords");
+const asideSiteCoordsCC = document.getElementById("aside-site-coords-cc");
+const asideSiteCoordsWGS84 = document.getElementById("aside-site-coords-wgs84");
+
+function displaySiteCoordinates(site) {
+    if (site.coordinatesCc && site.coordinatesCc.length >= 2) {
+        asideSiteCoordsCC.innerHTML = `<strong>${API_COORDS} du site :</strong><br>X : ${site.coordinatesCc[0].toFixed(3)} m<br>Y : ${site.coordinatesCc[1].toFixed(3)} m<br>Z : ${site.coordinatesCc[2] ? site.coordinatesCc[2].toFixed(3) : 'N/A'} m`;
+    }
+    if (site.coordinatesWgs84 && site.coordinatesWgs84.length >= 2) {
+        asideSiteCoordsWGS84.innerHTML = `<strong>GPS du site :</strong><br>Lon : ${site.coordinatesWgs84[0].toFixed(6)}<br>Lat : ${site.coordinatesWgs84[1].toFixed(6)}`;
+    }
+    asideSiteCoordsDiv.style.display = 'block';
+}
 
 async function initApp() {
     try {
@@ -29,6 +42,7 @@ async function initApp() {
                     // Zoom fluide vers les coordonnées du marqueur
                         map.flyTo(e.latlng, targetZoom, {animate: true, duration: 1.5 });
                         sideBarTitle.textContent = `${transformerTexte(site.name, "capitalize")}`;
+                        displaySiteCoordinates(site);
                         // addDynamicLayers(photos); // decommenter si site avec layers en dur *********
 
                         try {

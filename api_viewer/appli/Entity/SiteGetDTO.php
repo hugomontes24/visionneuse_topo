@@ -8,6 +8,8 @@ class SiteGetDTO
     private ?string $img = null;
     // private ?PointsGetDTO $Points=null;
     private array $coordinates = []; // [lng, lat] PROVENANT DE GEOM
+    private array $coordinatesCc = []; // [x, y, z] en CC47 (EPSG:3947)
+    private array $coordinatesWgs84 = []; // [lng, lat, z] en WGS84 (EPSG:4326)
    
      public function hydrate(array $data): self
     {
@@ -20,6 +22,8 @@ class SiteGetDTO
                     // $geoData['coordinates'] vaut directement [-0.250341, 47.66270438888889]
                     $this->setCoordinates($geoData['coordinates'] ?? []);
                 }
+        (isset ($data['coordinates_cc'])) ?$this->setCoordinatesCc( $data['coordinates_cc']): $this->setCoordinatesCc([]);
+        (isset ($data['coordinates_wgs84'])) ?$this->setCoordinatesWgs84( $data['coordinates_wgs84']): $this->setCoordinatesWgs84([]);
 
         return $this;
     }
@@ -31,7 +35,9 @@ class SiteGetDTO
             'name' => $this->name,
             'city' => $this->city,
             'img' => $this->img,
-            'coordinates' => $this->coordinates
+            'coordinates' => $this->coordinates,
+            'coordinatesCc' => $this->coordinatesCc,
+            'coordinatesWgs84' => $this->coordinatesWgs84
         ];
     }
     public function getId(): int
@@ -81,13 +87,48 @@ class SiteGetDTO
         return $this;
     }
 
+    public function getCoordinatesCc(): array
+    {
+        return $this->coordinatesCc;
+    }
+    public function setCoordinatesCc($coordinatesCc): self
+    {
+        $this->coordinatesCc = $coordinatesCc;
+        return $this;
+    }
 
-
+    public function getCoordinatesWgs84(): array
+    {
+        return $this->coordinatesWgs84;
+    }
+    public function setCoordinatesWgs84($coordinatesWgs84): self
+    {
+        $this->coordinatesWgs84 = $coordinatesWgs84;
+        return $this;
+    }
 }
 
 
+/** 
+
+ $PointsRepository = new PointsRepository();
+        $data1 = $PointsRepository->getOne($data['points_id']);
+
+        $PointsGetDTO = new PointsGetDTO();
+        $PointsGetDTO->hydrate($data1);
+        $this->Points= $PointsGetDTO;
 
 
+    public function getPoints(): PointsGetDTO
+    {
+        return $this->Points;
+    }
+    public function setPoints(PointsGetDTO $Points): void
+    {
+        $this->Points = $Points;
+    }
+
+*/
 
 /** 
 

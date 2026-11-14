@@ -13,6 +13,9 @@ Backend :
 - PHP
 - API REST
 - Architecture MVC personnalisée
+
+Serveur en dev :
+- LARAGON
 ## Règles
 Respecter l'architecture existante.
 Ne jamais proposer :

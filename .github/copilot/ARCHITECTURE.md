@@ -44,9 +44,10 @@ L'application permet :
 visionneuse_topo
 │
 ├── .github
-│	├── INSTRUCTIONS.md
-│	├── ARCHITECTURE.md
-│	├── CONTEXT.md
+│	├── copilot 
+│		├── INSTRUCTIONS.md
+│		├── ARCHITECTURE.md
+│		├── CONTEXT.md
 │
 ├── api_viewer
 │   ├── config

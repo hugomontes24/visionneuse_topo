@@ -10,6 +10,7 @@ const api_url = `http://localhost/${API_NAME}/api_viewer/`;
 const API_MAP_EPSG = `4326`; // WGS84
 const API_EPSG = `3944`;// pour beffes EPSG:3947
 // const API_EPSG = `3947`;     //***BEFFES  decommenter et aussi dans *** utils.js pour un projet cc47
+const API_COORDS = `CC44`; // Système de coordonnées du projet (CC44, CC47, etc.)
 
 const initialCoords = [43.5127, 5.3693]; // Centre du quart Sud-Est de la France (latitude, longitude)
 const zoomInitial1 = 9; // Zoom adapté au quart Sud-Est

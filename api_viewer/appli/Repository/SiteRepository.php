@@ -30,7 +30,9 @@ class SiteRepository
                     name,
                     city,
                     img,
-                    ST_AsGeoJSON(geom) AS geojson
+                    ST_AsGeoJSON(geom) AS geojson,
+                    json_build_array(ST_X(geom), ST_Y(geom), ST_Z(geom)) AS coordinates_cc,
+                    ST_AsGeoJSON(ST_Transform(geom, 4326))::json->'coordinates' AS coordinates_wgs84
                 FROM ". $this->table . " 
                 WHERE id = :id";
 
@@ -42,6 +44,16 @@ class SiteRepository
         // Si aucun résultat trouvé en BDD, on retourne null
         if (!$data) {
             return null;
+        }
+        if ($data['coordinates_cc'] !== null) {
+            $data['coordinates_cc'] = json_decode($data['coordinates_cc'], true);
+        } else {
+            $data['coordinates_cc'] = [];
+        }
+        if ($data['coordinates_wgs84'] !== null) {
+            $data['coordinates_wgs84'] = json_decode($data['coordinates_wgs84'], true);
+        } else {
+            $data['coordinates_wgs84'] = [];
         }
         $SiteGetDTO = new SiteGetDTO();
         $SiteGetDTO->hydrate($data);
@@ -59,12 +71,24 @@ class SiteRepository
                 name,
                 city,
                 img,
-                ST_AsGeoJSON(geom) AS geojson 
+                ST_AsGeoJSON(geom) AS geojson,
+                json_build_array(ST_X(geom), ST_Y(geom), ST_Z(geom)) AS coordinates_cc,
+                ST_AsGeoJSON(ST_Transform(geom, 4326))::json->'coordinates' AS coordinates_wgs84
               FROM " . $this->table;
 
     $statement = $pg_PDO->query($query);
     $sites = [];
     while ($row = $statement->fetch(PDO::FETCH_ASSOC)) {
+        if ($row['coordinates_cc'] !== null) {
+            $row['coordinates_cc'] = json_decode($row['coordinates_cc'], true);
+        } else {
+            $row['coordinates_cc'] = [];
+        }
+        if ($row['coordinates_wgs84'] !== null) {
+            $row['coordinates_wgs84'] = json_decode($row['coordinates_wgs84'], true);
+        } else {
+            $row['coordinates_wgs84'] = [];
+        }
         $siteGetDTO = new SiteGetDTO();
         $siteGetDTO->hydrate($row);
         

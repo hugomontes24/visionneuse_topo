@@ -15,7 +15,9 @@ async function getAllSites() {
             s.name,
             s.city,
             s.img,
-            [parseFloat(s.coordinates[0]), parseFloat(s.coordinates[1])]// [lng, lat] 
+            [parseFloat(s.coordinates[0]), parseFloat(s.coordinates[1])],// [lng, lat]
+            s.coordinatesCc || [],
+            s.coordinatesWgs84 || []
             ) );
 
         return sites;
