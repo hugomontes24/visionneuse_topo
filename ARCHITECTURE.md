@@ -1,330 +1,258 @@
 # ARCHITECTURE.md
-# Architecture de l'application de visualisation topographique
-## Vue d'ensemble
-L'application permet la consultation centralisée de données topographiques et géospatiales à travers une interface cartographique interactive.
-L'utilisateur peut :
-- visualiser les sites disponibles sur une carte ;
-- afficher les orthophotographies associées ;
-- consulter les réseaux humides (eaux pluviales et eaux usées) ;
-- comparer des campagnes de prises de vue à différentes dates ;
-- accéder aux modèles 3D ;
-- consulter les nuages de points ;
-- récupérer des coordonnées cartographiques.
-L'architecture repose sur un frontend JavaScript Vanilla et une API REST PHP.
+# Visionneuse Topographique
+## Présentation
+La Visionneuse Topographique est une application web permettant la consultation et l'analyse de données géospatiales.
+L'application permet :
+- la visualisation de sites sur une carte interactive ;
+- l'affichage d'orthophotographies ;
+- la consultation des réseaux humides (EP et EU) ;
+- la comparaison temporelle de campagnes de prises de vues ;
+- la visualisation de modèles 3D ;
+- l'accès à des nuages de points ;
+- la récupération de coordonnées cartographiques.
 ---
-# Architecture générale
+# Architecture globale
 ```text
-┌─────────────────────────────┐
-│     	Utilisateur     	│
-└──────────────┬──────────────┘
-           	│
-           	▼
-┌─────────────────────────────┐
-│ Frontend JavaScript Vanilla │
-│      	Leaflet        	│
-└──────────────┬──────────────┘
-           	│ Requêtes HTTP
-           	▼
-┌─────────────────────────────┐
-│    	API REST PHP     	│
-└──────────────┬──────────────┘
-           	│
-           	▼
-┌─────────────────────────────┐
-│ Repositories / Mappers  	│
-└──────────────┬──────────────┘
-           	│
-           	▼
-┌─────────────────────────────┐
-│  	Base de données    	│
-└─────────────────────────────┘
+┌───────────────┐
+│ Utilisateur   │
+└───────┬───────┘
+    	│
+    	▼
+┌────────────────────────────┐
+│ Frontend JS Vanilla    	│
+│ Leaflet + Three.js     	│
+└─────────────┬──────────────┘
+          	│ HTTP REST
+          	▼
+┌────────────────────────────┐
+│ API PHP MVC            	│
+└─────────────┬──────────────┘
+          	│
+          	▼
+┌────────────────────────────┐
+│ Repository / Mapper    	│
+└─────────────┬──────────────┘
+          	│
+          	▼
+┌────────────────────────────┐
+│ Base de données        	│
+└────────────────────────────┘
+```
+---
+# Arborescence du projet
+```text
+visionneuse_topo
+│
+├── README.md
+├── ARCHITECTURE.md
+├── AGENT_CONTEXT.md
+│
+├── api_viewer
+│   ├── config
+│   ├── index.php
+│   └── appli
+│   	├── Controller
+│   	├── Entity
+│   	├── Repository
+│   	├── Mapper
+│   	├── Kernel
+│   	└── ErrorHandler
+│
+└── ortho_viewer
+	├── css
+	├── js
+	├── gltfpack
+	├── index.html
+	└── zzBac
 ```
 ---
 # Frontend
 ## Technologies
 - JavaScript Vanilla
 - HTML5
-- CSS3
+- CSS3 / SCSS
 - Leaflet
 - Leaflet Draw
-- Leaflet Side By Side
-- Proj4js
+- Leaflet SideBySide
+- Proj4JS
 - Three.js
 ---
-# Structure du Frontend
+# Structure Frontend
+## Configuration
 ```text
-js/
-│
-├── Entities/
-│   ├── Site.js
-│   ├── Zone.js
-│   ├── ZoneDTO.js
-│   ├── Raster.js
-│   ├── Pipe.js
-│   └── Tampon.js
-│
-├── services/
-│   ├── serviceHttp.js
-│   ├── serviceSites.js
-│   ├── serviceZones.js
-│   ├── serviceRasters.js
-│   ├── servicePipes.js
-│   └── serviceTampons.js
-│
-├── methods/
-│   ├── initMap.js
-│   ├── layersManager.js
-│   ├── beforeAfter.js
-│   ├── pointCoords.js
-│   └── utils.js
-│
-├── modules/
-│   └── views.module.js
-│
-├── viewer.js
-├── custom.js
-└── methodsZones.js
+js/config/
+└── config.js
 ```
+Contient :
+- URL API ;
+- paramètres applicatifs ;
+- constantes.
 ---
-## Rôle des dossiers
-### Entities
-Contient les objets métier manipulés côté client.
-Exemples :
-- Site
-- Zone
-- Raster
-- Pipe
-- Tampon
-### Services
-Couche d'accès aux données.
-Responsabilités :
-- appels API REST ;
-- récupération des données ;
-- transformation des réponses ;
-- gestion des requêtes HTTP.
-### Methods
-Fonctionnalités cartographiques et outils utilisateur.
-Responsabilités :
-- initialisation de la carte ;
-- gestion des couches ;
-- comparaison avant/après ;
-- coordonnées ;
-- outils utilitaires.
-### Modules
-Composants fonctionnels réutilisables.
----
-# Interface Utilisateur
-## Carte principale
-La carte Leaflet constitue le cœur de l'application.
-Fonctions disponibles :
-- navigation ;
-- zoom ;
-- sélection des sites ;
-- affichage des couches ;
-- consultation des informations projet.
----
-## Contrôles cartographiques
-### Sélecteur 2D / 3D
-Permet de basculer entre :
-- la cartographie 2D ;
-- la visualisation 3D.
-### Nuage de points
-Permet d'ouvrir la visionneuse du nuage de points associé au site sélectionné.
-### Comparateur Avant / Après
-Permet d'afficher deux orthophotographies simultanément.
-Fonctionnalités :
-- synchronisation des vues ;
-- comparaison temporelle ;
-- ajustement de la transparence.
-### Coordonnées
-Permet de récupérer les coordonnées d'un point sélectionné sur la carte.
-### Dessin
-Utilise Leaflet Draw pour :
-- dessiner des polygones ;
-- ajouter des marqueurs ;
-- modifier des zones.
----
-# Sidebar
-La barre latérale affiche :
-- nom du site ;
-- description ;
-- coordonnées ;
-- informations complémentaires ;
-- historique des campagnes photos.
----
-# Gestion des couches
-L'application manipule plusieurs types de couches :
-## Orthophotos
-- affichage raster ;
-- historique par date ;
-- comparaison temporelle.
-## Réseaux EP
-Réseaux d'eaux pluviales :
-- canalisations ;
-- tampons.
-## Réseaux EU
-Réseaux d'eaux usées :
-- canalisations ;
-- tampons.
-## Zones
-- emprises ;
-- secteurs ;
-- limites d'étude.
----
-# Visualisation 3D
-Basée sur Three.js.
-Fonctionnalités :
-- chargement d'un modèle 3D ;
-- affichage plein écran ;
-- optimisation du rendu ;
-- gestion du cycle d'animation.
-Flux :
+## Entités Métier
 ```text
-Utilisateur
-  	│
-  	▼
-Bouton 3D
-  	│
-  	▼
-viewer.js
-  	│
-  	▼
-viewer3D.js
-  	│
-  	▼
-Three.js
-  	│
-  	▼
-Modèle .glb
+js/Entities/
 ```
+### Site
+Représente un site ou chantier.
+### Zone
+Zone géographique d'étude.
+### Raster
+Orthophotographie.
+### Photo
+Campagne photo ou photo terrain.
+### Pipe
+Canalisation réseau.
+### Tampon
+Ouvrage réseau.
+### Modele3D
+Modèle 3D d'un site.
+---
+## Services
+```text
+js/services/
+```
+Responsables des appels API.
+### serviceHttp.js
+Couche HTTP commune.
+### serviceSites.js
+Gestion des sites.
+### serviceZones.js
+Gestion des zones.
+### servicePhotos.js
+Gestion des photos.
+### serviceRasters.js
+Gestion des orthophotos.
+### servicePipes.js
+Gestion des réseaux.
+### serviceTampons.js
+Gestion des tampons.
+---
+## Méthodes cartographiques
+```text
+js/methods/
+```
+### initMap.js
+Initialisation Leaflet.
+### layersManager.js
+Gestion centralisée des couches.
+### beforeAfter.js
+Comparaison Avant / Après.
+### pointCoords.js
+Récupération des coordonnées.
+### utils.js
+Fonctions utilitaires.
+---
+## Modules Vue
+```text
+js/modules/
+```
+### views.module.js
+Gestion des vues de l'application.
+---
+## Visualisation
+### viewer.js
+Gestion générale des viewers.
+### viewer3D.js
+Visualisation Three.js.
 ---
 # Backend
 ## Technologies
-- PHP
+- PHP 8+
 - API REST
 - Architecture MVC personnalisée
+- PDO
 ---
-# Structure Backend
+# Pattern MVC
+Le backend suit le schéma :
 ```text
-appli/
-│
-├── Controller/
-├── Repository/
-├── Entity/
-├── Mapper/
-├── Kernel/
-├── ErrorHandler/
-└── config/
-```
----
-# Point d'entrée
-```text
-index.php
-```
-Responsabilités :
-- chargement automatique des classes ;
-- routage des requêtes ;
-- contrôle CORS ;
-- instanciation des contrôleurs ;
-- dispatch REST.
----
-# Routage dynamique
-Le système détermine automatiquement :
-- le Repository ;
-- le Mapper ;
-- le Controller ;
-à partir de l'URL appelée.
-Exemple :
-```text
-/api/sites
-    	│
-    	▼
-SiteController
-SiteRepository
-SiteMapper
-```
-ou
-```text
-/api/zones
-    	│
-    	▼
-ZoneController
-ZoneRepository
-ZoneMapper
+Controller
+	↓
+Repository
+	↓
+Mapper
+	↓
+Entity
 ```
 ---
 # Contrôleurs
-Responsabilités :
-- réception des requêtes ;
-- validation des paramètres ;
-- orchestration métier ;
-- préparation des réponses JSON.
-Exemples :
-- SiteController
-- ZoneController
-- RasterController
-- PipeController
+```text
+Controller/
+```
+### SiteController
+Gestion des sites.
+### ZoneController
+Gestion des zones.
+### RasterController
+Gestion des orthophotos.
+### PhotoController
+Gestion des photos.
+### PipeController
+Gestion des canalisations.
+### TamponController
+Gestion des tampons.
+---
+# Entités Backend
+```text
+Entity/
+```
+Entités principales :
+- Site
+- Zone
+- Raster
+- Photo
+- Pipe
+- Tampon
+DTO disponibles :
+- SiteGetDTO
+- ZoneGetDTO
+- RasterGetDTO
+- PhotoGetDTO
+- PhotoPatchDTO
+- PipeGetDTO
+- TamponGetDTO
 ---
 # Repositories
-Responsables de :
-- l'accès aux données ;
-- l'exécution des requêtes SQL ;
-- la persistance.
-Exemples :
-- SiteRepository
-- ZoneRepository
-- RasterRepository
-- PipeRepository
+```text
+Repository/
+```
+Responsables :
+- des requêtes SQL ;
+- du CRUD ;
+- de la récupération des données.
 ---
 # Mappers
-Assurent la conversion :
+```text
+Mapper/
+```
+Conversion :
 ```text
 Base de données
-    	│
-    	▼
+   	↓
  	Mapper
-    	│
-    	▼
- Objet métier
+   	↓
+ Objet PHP
 ```
-Exemples :
-- SiteMapper
-- ZoneMapper
-- RasterMapper
 ---
-# Entités Métier
-## Site
-Représente un site ou un chantier.
-Informations :
-- identifiant ;
-- nom ;
-- localisation ;
-- description.
-## Zone
-Représente une zone géographique liée au site.
-## Raster
-Orthophotographie ou couche raster.
-## Pipe
-Canalisation d'un réseau.
-Types :
-- eaux pluviales ;
-- eaux usées.
-## Tampon
-Ouvrage associé aux réseaux.
+# Noyau technique
+```text
+Kernel/
+```
+### PDOConnection.php
+Gestion de la connexion base de données.
 ---
-# Flux de données
+# Flux métier principal
 ## Chargement d'un site
 ```text
 Carte Leaflet
   	│
   	▼
-Sélection du site
+Sélection Site
   	│
   	▼
 serviceSites.js
   	│
   	▼
-API PHP
+API /sites
   	│
   	▼
 SiteController
@@ -336,46 +264,45 @@ SiteRepository
 Base de données
   	│
   	▼
-Réponse JSON
+JSON
   	│
   	▼
-Affichage dans la carte
+Affichage Carte
 ```
 ---
-# Fonctionnalités Métier
-## Consultation des orthophotos
-- affichage des campagnes ;
-- navigation temporelle ;
-- comparaison des dates.
-## Consultation des réseaux
-- affichage EP ;
-- affichage EU ;
-- superposition avec l'orthophoto.
-## Contrôle topographique
-- consultation des coordonnées ;
-- visualisation des emprises ;
-- analyse spatiale.
-## Analyse temporelle
-- mode Avant / Après ;
+# Fonctionnalités métier
+## Orthophotos
+- consultation raster ;
+- historique des campagnes ;
+- comparaison temporelle.
+## Réseaux
+### EP
+- canalisations ;
+- tampons.
+### EU
+- canalisations ;
+- tampons.
+## Avant / Après
+- synchronisation ;
 - transparence ;
-- comparaison des états.
-## Exploitation 3D
-- modèle 3D ;
-- inspection visuelle ;
-- compréhension du terrain.
-## Nuages de points
-- accès aux relevés ;
-- contrôle de détail ;
+- analyse d'évolution.
+## Modèles 3D
+- chargement GLB ;
+- navigation 3D ;
 - visualisation photogrammétrique.
+## Nuages de points
+- contrôle ;
+- inspection ;
+- visualisation détaillée.
 ---
 # Évolutions prévues
-- intégration des systèmes de coordonnées CC ;
+- gestion des Coniques Conformes (CC) ;
+- calcul automatique des systèmes de coordonnées ;
 - recherche multicritère ;
-- filtrage des projets ;
 - exports PDF ;
 - exports Excel ;
 - outils de mesure ;
-- génération de rapports ;
-- intégration d'agents Copilot ;
+- rapports automatiques ;
+- intégration Microsoft Copilot ;
 - automatisation du pointage des livrables.
 
