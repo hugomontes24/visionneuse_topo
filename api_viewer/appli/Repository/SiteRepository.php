@@ -31,8 +31,10 @@ class SiteRepository
                     city,
                     img,
                     ST_AsGeoJSON(geom) AS geojson,
-                    json_build_array(ST_X(geom), ST_Y(geom), ST_Z(geom)) AS coordinates_cc,
-                    ST_AsGeoJSON(ST_Transform(geom, 4326))::json->'coordinates' AS coordinates_wgs84
+                    CASE WHEN geom IS NULL OR ST_IsEmpty(geom) THEN NULL
+                         ELSE json_build_array(ST_X(ST_Transform(geom, 3944)), ST_Y(ST_Transform(geom, 3944)), ST_Z(geom))
+                    END AS coordinates_cc,
+                    ST_AsGeoJSON(geom)::json->'coordinates' AS coordinates_wgs84
                 FROM ". $this->table . " 
                 WHERE id = :id";
 
@@ -65,15 +67,16 @@ class SiteRepository
 {
     $pg_PDO = PDOConnection::pg_get();
 
-    // 1. Définition explicite des colonnes avec extraction du GeoJSON
     $query = "SELECT 
                 id,
                 name,
                 city,
                 img,
                 ST_AsGeoJSON(geom) AS geojson,
-                json_build_array(ST_X(geom), ST_Y(geom), ST_Z(geom)) AS coordinates_cc,
-                ST_AsGeoJSON(ST_Transform(geom, 4326))::json->'coordinates' AS coordinates_wgs84
+                CASE WHEN geom IS NULL OR ST_IsEmpty(geom) THEN NULL
+                     ELSE json_build_array(ST_X(ST_Transform(geom, 3944)), ST_Y(ST_Transform(geom, 3944)), ST_Z(geom))
+                END AS coordinates_cc,
+                ST_AsGeoJSON(geom)::json->'coordinates' AS coordinates_wgs84
               FROM " . $this->table;
 
     $statement = $pg_PDO->query($query);

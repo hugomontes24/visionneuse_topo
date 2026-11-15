@@ -11,7 +11,7 @@ function displaySiteCoordinates(site) {
     if (site.coordinatesWgs84 && site.coordinatesWgs84.length >= 2) {
         asideSiteCoordsWGS84.innerHTML = `<strong>GPS du site :</strong><br>Lon : ${site.coordinatesWgs84[0].toFixed(6)}<br>Lat : ${site.coordinatesWgs84[1].toFixed(6)}`;
     }
-    asideSiteCoordsDiv.style.display = 'block';
+    asideSiteCoordsDiv.classList.remove('hidden');
 }
 
 async function initApp() {
@@ -22,7 +22,7 @@ async function initApp() {
         // 2. Parcourir et ajouter chaque marqueur avec son popup
         sites.forEach(site => {
             // VERIFICATION : Assurez-vous d'avoir des coordonnées valides
-            if (site.coordinates && site.coordinates.length === 2) {
+            if (site.coordinates && site.coordinates.length >= 2) {
                 if( SITES_IDS.includes(site.id))  { // si site.id est dans sitesIds config.js
                     // const marker = L.marker([site.coordinates[1], site.coordinates[0]]).addTo(map);
                     const marker = L.marker([site.coordinates[1], site.coordinates[0]]); // TODO METTRE A JOUR SITE COORDONNEES

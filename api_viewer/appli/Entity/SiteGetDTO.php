@@ -8,7 +8,7 @@ class SiteGetDTO
     private ?string $img = null;
     // private ?PointsGetDTO $Points=null;
     private array $coordinates = []; // [lng, lat] PROVENANT DE GEOM
-    private array $coordinatesCc = []; // [x, y, z] en CC47 (EPSG:3947)
+    private array $coordinatesCc = []; // [x, y, z] en CC44 (EPSG:3944)
     private array $coordinatesWgs84 = []; // [lng, lat, z] en WGS84 (EPSG:4326)
    
      public function hydrate(array $data): self

@@ -5,7 +5,7 @@ class Site{
         this.city = city;
         this.img = img; // URL de l'image                 
         this.coordinates = coordinates; // [  [lng, lat], [lng, lat]  ] 
-        this.coordinatesCc = coordinatesCc; // [x, y, z] en CC47
+        this.coordinatesCc = coordinatesCc; // [x, y, z] en CC44
         this.coordinatesWgs84 = coordinatesWgs84; // [lng, lat, z] en WGS84
     }
 
